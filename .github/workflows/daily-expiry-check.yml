@@ -1,0 +1,38 @@
+name: Daily Grocery Expiry Check
+
+# Schedule to run every day at 9 AM UTC (adjust timezone as needed)
+on:
+  schedule:
+    - cron: '0 9 * * *'  # 9 AM UTC daily (change to '0 2 * * *' for 2 AM)
+  workflow_dispatch:  # Allows manual triggering for testing
+
+jobs:
+  send-expiry-notifications:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v5  # Updated to latest version
+      with:
+        python-version: '3.9'
+        
+    - name: Install dependencies
+      run: |
+        pip install pymongo python-dotenv dateparser smtplib  # Add smtplib if your script uses email
+        
+    - name: Run expiry notification script
+      env:
+        MONGO_URI: ${{ secrets.MONGO_URI }}
+        EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
+        EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD }}
+        TO_EMAIL: ${{ secrets.TO_EMAIL }}
+        SMTP_SERVER: smtp.gmail.com
+        SMTP_PORT: 587
+      run: python send_expiry_notifications.py
+      
+    - name: Log failure (if any)
+      if: failure()
+      run: echo "Workflow failed - check logs for details"
