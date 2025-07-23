@@ -1,0 +1,17 @@
+streamlit==1.45.1
+pymongo
+azure-ai-documentintelligence>=1.0.0
+azure-core>=1.25.0
+pytesseract
+easyocr
+opencv-python-headless
+numpy==2.3.1
+pandas==2.2.3
+plotly==5.22.0
+python-dateutil==2.9.0.post0
+dateparser
+fpdf2==2.8.3
+schedule
+python-dotenv
+Pillow
+packaging==24.1
