@@ -1,2 +1,23 @@
 # Environment files
 .env
+# Python cache and temp files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment and secrets
+.env
+*.key
+*.secret
+
+# Streamlit temp
+.streamlit/
+
+# Logs and databases
+*.log
+*.db
+
+# Large files (if any)
+predicted_image.jpg
+temp_image.jpg
