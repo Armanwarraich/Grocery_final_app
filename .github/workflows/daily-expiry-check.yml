@@ -3,7 +3,7 @@ name: Daily Grocery Expiry Check
 # Schedule to run every day at 9 AM UTC (adjust timezone as needed)
 on:
   schedule:
-    - cron: '0 9 * * *'  # 9 AM UTC daily (change to '0 2 * * *' for 2 AM)
+    - cron: '30 3 * * *'  # 9 AM UTC daily (change to '0 2 * * *' for 2 AM)
   workflow_dispatch:  # Allows manual triggering for testing
 
 jobs:
