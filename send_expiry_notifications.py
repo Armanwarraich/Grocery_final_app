@@ -1,12 +1,9 @@
-from dotenv import load_dotenv
-load_dotenv()  # This will load .env variables into os.environ
 import smtplib
 from email.mime.text import MIMEText
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 import dateparser
 import os
-
 
 # --- CONFIG ---
 MONGO_URI = os.environ.get("MONGO_URI")
@@ -121,7 +118,7 @@ def main():
                 else:
                     print(f"❌ Failed to send notification to {user_email}")
             else:
-                print(f"✅ No expiring products for {user_email}")
+                print(f"✅ No expiring products for {user_email}. Skipping email.")
 
     except Exception as e:
         print(f"❌ Error in main function: {e}")
@@ -131,11 +128,3 @@ if __name__ == "__main__":
     print("🚀 Starting grocery expiry check...")
     main()
     print("🏁 Grocery expiry check completed!")
-
-def test_email():
-    subject = "Test Email from Grocery App"
-    body = "This is a test email to verify sending works."
-    send_email(subject, body, TO_EMAILS)
-
-if __name__ == "__main__":
-    test_email()  # Run this instead of main() for testing
