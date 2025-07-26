@@ -33,6 +33,9 @@ def login_user(email, password):
     return False
 
 def add_user_to_db(email):
-    """Ensure user exists in users collection."""
-    if users.find_one({"email": email}) is None:
-        users.insert_one({"email": email})
+    from utils.database import users  # Avoids circular import
+    try:
+        if users.find_one({"email": email}) is None:
+            users.insert_one({"email": email})
+    except Exception as e:
+        print(f"User insertion skipped or failed: {e}")
