@@ -9,93 +9,276 @@ def setup_page_config():
     )
 
 def apply_theme(theme):
-    dark_styles = """
-    body {
-        background: linear-gradient(135deg, #141e30, #243b55);
-        font-family: 'Segoe UI', sans-serif;
-    }
-    """
-
-    light_styles = """
-    body {
-        background: linear-gradient(135deg, #fdfbfb, #ebedee);
-        font-family: 'Segoe UI', sans-serif;
-    }
-    """
+    if theme == "dark":
+        theme_styles = """
+        .stApp {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%) !important;
+            color: #ffffff !important;
+        }
+        .stSidebar {
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
+        }
+        .stTabs [data-baseweb="tab-list"] {
+            background: rgba(255,255,255,0.1) !important;
+            border-radius: 10px !important;
+        }
+        .stTabs [data-baseweb="tab"] {
+            color: #ffffff !important;
+            background: rgba(255,255,255,0.1) !important;
+        }
+        .stTabs [data-baseweb="tab"][aria-selected="true"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+        .stMetric {
+            background: rgba(30,30,50,0.8) !important;
+            padding: 15px !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(255,255,255,0.2) !important;
+        }
+        .stMetric [data-testid="metric-container"] {
+            background: rgba(30,30,50,0.8) !important;
+            color: #ffffff !important;
+        }
+        .stMetric [data-testid="metric-container"] > div {
+            color: #ffffff !important;
+        }
+        .stMetric label {
+            color: #ffffff !important;
+        }
+        .stMetric [data-testid="metric-container"] [data-testid="metric-value"] {
+            color: #ffffff !important;
+        }
+        .stRadio > div {
+            background: rgba(255,255,255,0.15) !important;
+            padding: 15px !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(255,255,255,0.3) !important;
+        }
+        .stRadio > div > label {
+            color: #ffffff !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+        }
+        .stRadio > div > label > div {
+            color: #ffffff !important;
+        }
+        .stRadio > div > label > div[data-testid="stMarkdownContainer"] {
+            color: #ffffff !important;
+        }
+        .stRadio > div > label > div[data-testid="stMarkdownContainer"] p {
+            color: #ffffff !important;
+        }
+        """
+    else:  # light theme
+        theme_styles = """
+        .stApp {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%) !important;
+            color: #333333 !important;
+        }
+        .stSidebar {
+            background: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%) !important;
+        }
+        .stTabs [data-baseweb="tab-list"] {
+            background: rgba(0,0,0,0.05) !important;
+            border-radius: 10px !important;
+        }
+        .stTabs [data-baseweb="tab"] {
+            color: #333333 !important;
+            background: rgba(255,255,255,0.8) !important;
+        }
+        .stTabs [data-baseweb="tab"][aria-selected="true"] {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+        .stMetric {
+            background: rgba(255,255,255,0.8) !important;
+            padding: 15px !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(0,0,0,0.1) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1) !important;
+        }
+        .stMetric [data-testid="metric-container"] {
+            background: rgba(255,255,255,0.8) !important;
+            color: #333333 !important;
+        }
+        .stMetric [data-testid="metric-container"] > div {
+            color: #333333 !important;
+        }
+        .stMetric label {
+            color: #333333 !important;
+        }
+        .stMetric [data-testid="metric-container"] [data-testid="metric-value"] {
+            color: #333333 !important;
+        }
+        .stRadio > div {
+            background: rgba(102, 126, 234, 0.1) !important;
+            padding: 15px !important;
+            border-radius: 10px !important;
+            border: 1px solid rgba(102, 126, 234, 0.3) !important;
+        }
+        .stRadio > div > label {
+            color: #333333 !important;
+            font-weight: 600 !important;
+            font-size: 1.1rem !important;
+        }
+        .stRadio > div > label > div {
+            color: #333333 !important;
+        }
+        .stRadio > div > label > div[data-testid="stMarkdownContainer"] {
+            color: #333333 !important;
+        }
+        .stRadio > div > label > div[data-testid="stMarkdownContainer"] p {
+            color: #333333 !important;
+        }
+        """
 
     common_styles = """
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap');
+    
+    * {
+        font-family: 'Poppins', sans-serif !important;
+    }
+    
     h1 {
         font-size: 3rem;
-        font-weight: bold;
+        font-weight: 700;
         text-align: center;
-        background: linear-gradient(90deg, #a18cd1, #fbc2eb);
+        background: linear-gradient(90deg, #667eea, #764ba2);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
         animation: glow 2s ease-in-out infinite alternate;
     }
-    @keyframes glow {
-        from { text-shadow: 0 0 10px #a18cd1; }
-        to { text-shadow: 0 0 20px #fbc2eb; }
+    
+    h3 {
+        color: inherit !important;
     }
+    
+    @keyframes glow {
+        from { filter: brightness(1); }
+        to { filter: brightness(1.2); }
+    }
+    
     .tip, .quote {
         text-align: center;
         font-style: italic;
         font-size: 1.1rem;
-        color: #ffe3ff;
-        margin-top: 1rem;
+        margin: 1rem 0;
+        padding: 15px;
+        border-radius: 10px;
+        background: rgba(102, 126, 234, 0.15);
+        border-left: 4px solid #667eea;
+        color: inherit;
     }
+    
     .login-header {
         font-size: 2.7rem;
         text-align: center;
-        font-weight: bold;
-        background: linear-gradient(90deg, #a18cd1, #fbc2eb);
+        font-weight: 700;
+        background: linear-gradient(90deg, #667eea, #764ba2);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+        background-clip: text;
     }
+    
     .login-subheader {
         text-align: center;
         font-style: italic;
         font-size: 1.2rem;
         margin-top: -10px;
-        color: #fce3ff;
+        opacity: 0.8;
     }
-    .sidebar-content {
-        font-size: 1rem;
-        color: #ffe3ff;
-        padding-bottom: 8px;
-        border-bottom: 1px dashed #fff;
-        margin-bottom: 10px;
-        font-style: italic;
+    
+    .stButton > button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+        color: white !important;
+        border: none !important;
+        border-radius: 25px !important;
+        font-weight: 600 !important;
+        font-family: 'Poppins', sans-serif !important;
+        transition: all 0.3s ease !important;
+        padding: 12px 30px !important;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3) !important;
     }
-    .badge {
-        font-size: 14px;
-        font-weight: bold;
-        padding: 10px;
-        border-radius: 10px;
-        background: linear-gradient(90deg, #a18cd1, #fbc2eb);
-        color: white;
-        margin-bottom: 1rem;
-        text-align: center;
-        word-break: break-word;
+    
+    .stButton > button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4) !important;
+        background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
     }
-    .logout-button button {
-        background: linear-gradient(90deg, #ff758c, #ff7eb3);
-        color: white;
-        border: none;
-        font-size: 16px;
-        font-weight: bold;
-        border-radius: 20px;
-        padding: 10px 20px;
-        width: 100%;
+    
+    .stTextInput > div > div > input {
+        border-radius: 10px !important;
+        border: 2px solid rgba(102, 126, 234, 0.3) !important;
+        font-family: 'Poppins', sans-serif !important;
+        padding: 12px !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: #333333 !important;
     }
-    .logout-button button:hover {
-        box-shadow: 0 4px 15px rgba(255, 150, 200, 0.5);
-        transform: scale(1.02);
+    
+    .stTextInput > div > div > input:focus {
+        border-color: #667eea !important;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2) !important;
+        background: rgba(255, 255, 255, 1) !important;
+    }
+    
+    .stTextInput > div > div > input::placeholder {
+        color: #666666 !important;
+    }
+    
+    .stTextInput label {
+        color: inherit !important;
+        font-weight: 600 !important;
+    }
+    
+    .stSelectbox > div > div {
+        border-radius: 10px !important;
+        border: 2px solid rgba(102, 126, 234, 0.3) !important;
+        background: rgba(255, 255, 255, 0.9) !important;
+        color: #333333 !important;
+    }
+    
+    .stSelectbox label {
+        color: inherit !important;
+        font-weight: 600 !important;
+    }
+    
+    .stForm {
+        background: rgba(255, 255, 255, 0.95) !important;
+        padding: 20px !important;
+        border-radius: 15px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1) !important;
+        color: #333333 !important;
+    }
+    
+    .stForm h3 {
+        color: #333333 !important;
+    }
+    
+    .stForm label {
+        color: #333333 !important;
+    }
+    
+    .stForm [data-testid="stMarkdownContainer"] {
+        color: #333333 !important;
+    }
+    
+    /* Fix file uploader visibility */
+    .stFileUploader > div {
+        background: rgba(255, 255, 255, 0.9) !important;
+        border-radius: 10px !important;
+        padding: 15px !important;
+        border: 2px dashed rgba(102, 126, 234, 0.3) !important;
+    }
+    
+    .stFileUploader label {
+        color: inherit !important;
+        font-weight: 600 !important;
     }
     """
 
-    theme_css = dark_styles if theme == "dark" else light_styles
-    st.markdown(f"<style>{theme_css + common_styles}</style>", unsafe_allow_html=True)
+    st.markdown(f"<style>{theme_styles + common_styles}</style>", unsafe_allow_html=True)
 
 def get_daily_content():
     tips = [

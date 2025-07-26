@@ -42,11 +42,48 @@ def render_dashboard():
     products = get_user_products(st.session_state["user_email"])
     expired, soon, fresh = get_status_counts(products)
     
-    # Metrics
+    # Metrics with better styling for dark theme
     c1, c2, c3 = st.columns(3)
-    c1.metric("⏳ Expired Items", expired)
-    c2.metric("⚡ Expiring Soon (3d)", soon)
-    c3.metric("🌱 Fresh Items", fresh)
+    
+    # Use custom styled metrics that work better with themes
+    with c1:
+        st.markdown(f"""
+            <div style='background: rgba(255, 107, 107, 0.9); 
+                        color: white; 
+                        padding: 20px; 
+                        border-radius: 12px; 
+                        text-align: center;
+                        box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);'>
+                <div style='font-size: 0.95rem; font-weight: 600; margin-bottom: 8px;'>⏳ Expired Items</div>
+                <div style='font-size: 2.2rem; font-weight: bold;'>{expired}</div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with c2:
+        st.markdown(f"""
+            <div style='background: rgba(255, 167, 38, 0.9); 
+                        color: white; 
+                        padding: 20px; 
+                        border-radius: 12px; 
+                        text-align: center;
+                        box-shadow: 0 4px 15px rgba(255, 167, 38, 0.3);'>
+                <div style='font-size: 0.95rem; font-weight: 600; margin-bottom: 8px;'>⚡ Expiring Soon (3d)</div>
+                <div style='font-size: 2.2rem; font-weight: bold;'>{soon}</div>
+            </div>
+        """, unsafe_allow_html=True)
+    
+    with c3:
+        st.markdown(f"""
+            <div style='background: rgba(102, 187, 106, 0.9); 
+                        color: white; 
+                        padding: 20px; 
+                        border-radius: 12px; 
+                        text-align: center;
+                        box-shadow: 0 4px 15px rgba(102, 187, 106, 0.3);'>
+                <div style='font-size: 0.95rem; font-weight: 600; margin-bottom: 8px;'>🌱 Fresh Items</div>
+                <div style='font-size: 2.2rem; font-weight: bold;'>{fresh}</div>
+            </div>
+        """, unsafe_allow_html=True)
     
     # Daily content
     get_daily_content()
@@ -57,22 +94,64 @@ def render_dashboard():
     # Main tabs
     render_main_tabs(products)
 
+
 def render_sidebar(products, expired, soon, fresh):
     with st.sidebar:
-        st.markdown(f"<div class='badge'>👤 Logged in as:<br>{st.session_state['user_email']}</div>", unsafe_allow_html=True)
-        
+        # User info with bigger styling
         st.markdown(f"""
-        <div class='sidebar-content'>❗ Expired Items: <b>{expired}</b></div>
-        <div class='sidebar-content'>⚡ Expiring Soon: <b>{soon}</b></div>
-        <div class='sidebar-content'>🌱 Fresh Items: <b>{fresh}</b></div>
+            <div style='background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        padding: 20px;
+                        border-radius: 15px;
+                        text-align: center;
+                        margin-bottom: 25px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);'>
+                <div style='font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;'>👤 Logged in as:</div>
+                <div style='font-size: 0.9rem; word-break: break-word;'>{st.session_state['user_email']}</div>
+            </div>
         """, unsafe_allow_html=True)
         
-        # Theme selector
-        theme_choice = st.radio("🌙☀ Theme:", ["dark", "light"], 
-                               index=0 if st.session_state["theme"] == "dark" else 1)
-        if theme_choice != st.session_state["theme"]:
-            st.session_state["theme"] = theme_choice
+        # Stats boxes with bigger styling
+        st.markdown(f"""
+            <div style='margin-bottom: 20px;'>
+                <div style='background: #ff6b6b; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(255,107,107,0.3);'>
+                    <div style='font-size: 1.1rem; font-weight: 600;'>❗ Expired Items</div>
+                    <div style='font-size: 1.8rem; font-weight: bold; margin-top: 5px;'>{expired}</div>
+                </div>
+                <div style='background: #ffa726; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(255,167,38,0.3);'>
+                    <div style='font-size: 1.1rem; font-weight: 600;'>⚡ Expiring Soon</div>
+                    <div style='font-size: 1.8rem; font-weight: bold; margin-top: 5px;'>{soon}</div>
+                </div>
+                <div style='background: #66bb6a; color: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 3px 10px rgba(102,187,106,0.3);'>
+                    <div style='font-size: 1.1rem; font-weight: 600;'>🌱 Fresh Items</div>
+                    <div style='font-size: 1.8rem; font-weight: bold; margin-top: 5px;'>{fresh}</div>
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Theme selector with bigger styling
+        st.markdown("""
+            <div style='background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                        color: white;
+                        padding: 18px;
+                        border-radius: 15px;
+                        text-align: center;
+                        margin-bottom: 20px;
+                        box-shadow: 0 4px 15px rgba(0,0,0,0.2);'>
+                <div style='font-size: 1.2rem; font-weight: 600; margin-bottom: 15px;'>🌙☀ Theme</div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        theme_choice = st.radio("", ["🌙 Dark", "☀ Light"], 
+                               index=0 if st.session_state["theme"] == "dark" else 1,
+                               label_visibility="collapsed")
+        
+        # Update theme
+        new_theme = "dark" if "Dark" in theme_choice else "light"
+        if new_theme != st.session_state["theme"]:
+            st.session_state["theme"] = new_theme
             st.rerun()
+
 
 def render_main_tabs(products):
     tabs = st.tabs(["📋 Products", "➕ Add Item", "📊 Insights", "⚡ Alerts", "♻ Recycle Bin"])

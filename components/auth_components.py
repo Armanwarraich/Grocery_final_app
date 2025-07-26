@@ -2,60 +2,87 @@ import streamlit as st
 from utils.auth_utils import login_user, register_user, assess_password_strength
 
 def render_auth_section():
-    st.markdown("<div class='login-header'>🌟 Smart Expiry Tracker</div>", unsafe_allow_html=True)
-    st.markdown("<div class='login-subheader'>Organize your pantry with AI – Smart, Fast, Magical! 🪄</div>", unsafe_allow_html=True)
+    # Vertical spacing
+    st.markdown("<div style='height:6vh;'></div>", unsafe_allow_html=True)
     
-    col1, col2 = st.columns([1, 1])
+    # App title
+    st.markdown("""
+        <div style='text-align: center; margin-bottom: 40px;'>
+            <h1 style='color: #1a73e8; font-size: 2.5rem; margin-bottom: 8px; font-weight: 600;'>
+                🛍️ Smart Expiry Tracker
+            </h1>
+            <p style='color: #5f6368; font-size: 1.1rem; margin: 0;'>
+                Organize your pantry with AI
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
     
-    with col1:
-        if st.session_state.get("show_login", True):
+    # Center the form (no white box)
+    col1, col2, col3 = st.columns([1, 1.5, 1])
+    with col2:
+        # Tab buttons
+        mode = st.session_state.get("auth_mode", "login")
+        tab_col1, tab_col2 = st.columns([1, 1])
+        with tab_col1:
+            if st.button("Sign In", use_container_width=True, key="login_tab"):
+                st.session_state["auth_mode"] = "login"
+                st.rerun()
+        with tab_col2:
+            if st.button("Create Account", use_container_width=True, key="signup_tab"):
+                st.session_state["auth_mode"] = "signup"
+                st.rerun()
+
+        st.markdown("<div style='margin: 32px 0;'></div>", unsafe_allow_html=True)
+
+        # Forms
+        if mode == "login":
             render_login_form()
         else:
             render_signup_form()
-    
-    with col2:
-        toggle_text = "Sign Up" if st.session_state.get("show_login", True) else "Sign In"
-        if st.button(f"🔁 Switch to {toggle_text}", use_container_width=True):
-            st.session_state["show_login"] = not st.session_state.get("show_login", True)
-            st.rerun()
 
 def render_login_form():
     with st.form("login_form"):
-        st.markdown("<h3 style='text-align:center;'>👤 Sign In</h3>", unsafe_allow_html=True)
-        email = st.text_input("Email:", key="login_email")
-        password = st.text_input("Password:", type="password", key="login_pw")
+        st.markdown("<h3 style='color: #202124; text-align: center; margin-bottom: 24px;'>Sign in to your account</h3>", unsafe_allow_html=True)
         
-        if st.form_submit_button("🚀 Sign In"):
-            if email and password:
-                if login_user(email, password):
-                    st.session_state["user_email"] = email
-                    st.success(f"✅ Welcome back, {email}!")
-                    st.rerun()
+        email = st.text_input("Email", placeholder="Enter your email")
+        password = st.text_input("Password", placeholder="Enter your password", type="password")
+        
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.form_submit_button("Sign In", use_container_width=True):
+                if email and password:
+                    if login_user(email, password):
+                        st.session_state["user_email"] = email
+                        st.success("✅ Welcome back!")
+                        st.rerun()
+                    else:
+                        st.error("❌ Invalid credentials")
                 else:
-                    st.error("❌ Incorrect email or password.")
-            else:
-                st.error("❌ Please fill in all fields.")
+                    st.error("❌ Please fill all fields")
 
 def render_signup_form():
     with st.form("signup_form"):
-        st.markdown("<h3 style='text-align:center;'>📝 Create an Account</h3>", unsafe_allow_html=True)
-        email = st.text_input("Email:", key="register_email")
-        password = st.text_input("Password:", type="password", key="register_pw")
+        st.markdown("<h3 style='color: #202124; text-align: center; margin-bottom: 24px;'>Create your account</h3>", unsafe_allow_html=True)
+        
+        email = st.text_input("Email", placeholder="Enter your email")
+        password = st.text_input("Password", placeholder="Create a password", type="password")
         
         if password:
             strength = assess_password_strength(password)
-            st.markdown(f"<div class='sidebar-content'>🔐 Password Strength: <i>{strength}</i></div>", unsafe_allow_html=True)
+            st.markdown(f"<small style='color: #5f6368;'>🔐 Password strength: {strength}</small>", unsafe_allow_html=True)
         
-        if st.form_submit_button("🌟 Sign Up Now"):
-            if email and password:
-                if assess_password_strength(password) == "Strong ✅":
-                    if register_user(email, password):
-                        st.success("🎉 Registration successful! You can now sign in.")
-                        st.session_state["show_login"] = True
-                        st.rerun()
+        col1, col2, col3 = st.columns([1, 2, 1])
+        with col2:
+            if st.form_submit_button("Create Account", use_container_width=True):
+                if email and password:
+                    if "Strong" in assess_password_strength(password):
+                        if register_user(email, password):
+                            st.success("🎉 Account created!")
+                            st.session_state["auth_mode"] = "login"
+                            st.rerun()
+                        else:
+                            st.error("❌ Email already registered")
                     else:
-                        st.error("❌ Email already registered.")
+                        st.warning("⚠️ Use a stronger password")
                 else:
-                    st.warning("⚠ Please use a stronger password.")
-            else:
-                st.error("❌ Please fill in all fields.")
+                    st.error("❌ Please fill all fields")

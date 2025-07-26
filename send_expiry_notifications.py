@@ -1,3 +1,8 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()  # Load variables from .env file
+
 import smtplib
 from email.mime.text import MIMEText
 from pymongo import MongoClient
@@ -6,8 +11,6 @@ import dateparser
 import os
 from dotenv import load_dotenv
 
-# Load .env variables
-load_dotenv()
 
 # --- CONFIG ---
 MONGO_URI = os.environ.get("MONGO_URI")

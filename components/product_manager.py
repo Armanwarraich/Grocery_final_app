@@ -9,8 +9,6 @@ import dateparser
 from utils.database import get_user_products, get_deleted_products, add_product, update_product, delete_product, restore_product
 from utils.ocr_processor import process_image_ocr, process_dual_image_ocr, apply_hitl_feedback
 from utils.helpers import get_expiry_status, filter_products
-from utils.ocr_processor import process_image_ocr, process_dual_image_ocr, apply_hitl_feedback
-
 
 def render_products_tab(products):
     st.markdown("<h2>📋 Products List</h2>", unsafe_allow_html=True)
@@ -84,10 +82,15 @@ def render_image_upload_form():
         st.rerun()
     
     st.markdown("### 📱 Choose Upload Option:")
+    
+    # Fixed: Changed the text color to white for dark theme visibility
+    st.markdown('<p style="color: white; font-weight: 500; margin-bottom: 10px;">Select how you want to upload images:</p>', unsafe_allow_html=True)
+    
     upload_option = st.radio(
-        "Select how you want to upload images:",
+        "",  # Empty label since we're using custom text above
         ["📷 Single Photo", "🔄 Both Sides (Front & Back)"],
-        key="upload_option"
+        key="upload_option",
+        label_visibility="collapsed"
     )
     
     upload_counter = st.session_state.get('upload_counter', 0)
