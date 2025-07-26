@@ -1,36 +1,33 @@
 from dotenv import load_dotenv
-import os
-
-load_dotenv()  # Load variables from .env file
-
+load_dotenv()  # This will load .env variables into os.environ
 import smtplib
 from email.mime.text import MIMEText
 from pymongo import MongoClient
 from datetime import datetime, timedelta
 import dateparser
 import os
-from dotenv import load_dotenv
 
 
 # --- CONFIG ---
 MONGO_URI = os.environ.get("MONGO_URI")
 if not MONGO_URI:
-    raise ValueError("❌ MONGO_URI environment variable not set. Please add it to your .env file or environment.")
+    raise ValueError("❌ MONGO_URI environment variable not set.")
 
 DB_NAME = "grocery_db"
 COLLECTION_NAME = "products"
+USERS_COLLECTION = "users"  # Assumes you have a 'users' collection with emails
 
 # Email config
 SMTP_SERVER = os.environ.get("SMTP_SERVER", "smtp.gmail.com")
 SMTP_PORT = int(os.environ.get("SMTP_PORT", 587))
 EMAIL_ADDRESS = os.environ.get("EMAIL_ADDRESS")
 EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
-TO_EMAILS = os.environ.get("TO_EMAIL")
+TO_EMAIL = os.environ.get("TO_EMAIL")
 
-if not all([EMAIL_ADDRESS, EMAIL_PASSWORD, TO_EMAILS]):
-    raise ValueError("❌ EMAIL_ADDRESS, EMAIL_PASSWORD, or TO_EMAIL not set in environment.")
+if not all([EMAIL_ADDRESS, EMAIL_PASSWORD, TO_EMAIL]):
+    raise ValueError("❌ EMAIL_ADDRESS, EMAIL_PASSWORD, or TO_EMAIL not set.")
 
-TO_EMAILS = TO_EMAILS.split(",")
+TO_EMAILS = TO_EMAIL.split(",")
 
 # --- FUNCTION TO SEND EMAIL ---
 def send_email(subject, body, to_emails):
@@ -55,54 +52,76 @@ def send_email(subject, body, to_emails):
 def main():
     try:
         print("🔍 Connecting to MongoDB...")
-        client = MongoClient(MONGO_URI)
+        client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)  # Added timeout for faster failure
         db = client[DB_NAME]
         collection = db[COLLECTION_NAME]
-        client.admin.command('ping')
-        print("✅ MongoDB connection successful")
+        users_collection = db[USERS_COLLECTION]
+        
+        # Test connection
+        try:
+            client.admin.command('ping')
+            print("✅ MongoDB connection successful")
+        except Exception as e:
+            raise ValueError(f"❌ Failed to connect to MongoDB: {e}. Check MONGO_URI (ensure correct cluster name, username, password, and whitelist GitHub IP).")
+
+        # Get all users
+        users = list(users_collection.find({}, {"email": 1}))
+        if not users:
+            print("⚠️ No users found in database.")
+            return
 
         now = datetime.now()
         target_date = now + timedelta(days=3)
 
-        print(f"📅 Checking for products expiring on: {target_date.strftime('%Y-%m-%d')}")
+        print(f"📅 Checking for products expiring on or before: {target_date.strftime('%Y-%m-%d')}")
 
         lower_bound = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
         upper_bound = target_date.replace(hour=23, minute=59, second=59, microsecond=999999)
 
-        products = list(collection.find({
-            "expiry": {
-                "$gte": lower_bound,
-                "$lte": upper_bound
+        for user in users:
+            user_email = user.get("email")
+            if not user_email:
+                continue
+
+            print(f"🔍 Checking products for user: {user_email}")
+
+            products_query = {
+                "user_email": user_email,
+                "expiry": {
+                    "$gte": lower_bound,
+                    "$lte": upper_bound
+                }
             }
-        }))
 
-        print(f"📦 Found {len(products)} products expiring in 3 days")
+            expiring_products = list(collection.find(products_query))
 
-        if not products:
-            print("✅ No products expiring in 3 days. No email needed.")
-            return
+            print(f"📦 Found {len(expiring_products)} products expiring soon for {user_email}")
 
-        body = "🚨 GROCERY EXPIRY ALERT 🚨\n\n"
-        body += f"The following {len(products)} product(s) are expiring in 3 days:\n\n"
+            if expiring_products:
+                body = "🚨 GROCERY EXPIRY ALERT 🚨\n\n"
+                body += f"The following {len(expiring_products)} product(s) are expiring soon:\n\n"
 
-        for i, p in enumerate(products, 1):
-            name = p.get("name", "Unnamed Product")
-            expiry = p.get("expiry")
-            if isinstance(expiry, str):
-                expiry = dateparser.parse(expiry)
-            exp_str = expiry.strftime("%Y-%m-%d") if expiry else "Unknown"
-            body += f"{i}. 📦 {name}\n   📅 Expires: {exp_str}\n\n"
+                for i, p in enumerate(expiring_products, 1):
+                    name = p.get("name", "Unnamed Product")
+                    expiry = p.get("expiry")
+                    if isinstance(expiry, str):
+                        expiry = dateparser.parse(expiry)
+                    exp_str = expiry.strftime("%Y-%m-%d") if expiry else "Unknown"
+                    body += f"{i}. 📦 {name}\n   📅 Expires: {exp_str}\n\n"
 
-        body += "⏰ Don't forget to use or dispose of these items soon!\n\n"
-        body += "---\n"
-        body += "🤖 This is an automated reminder from your AI Grocery Expiry Tracker.\n"
-        body += f"📧 Sent on: {now.strftime('%Y-%m-%d at %H:%M:%S')}"
+                body += "⏰ Don't forget to use or dispose of these items soon!\n\n"
+                body += "---\n"
+                body += "🤖 This is an automated reminder from your AI Grocery Expiry Tracker.\n"
+                body += f"📧 Sent on: {now.strftime('%Y-%m-%d at %H:%M:%S')}"
 
-        subject = f"🚨 {len(products)} Grocery Item(s) Expiring Soon!"
-        if send_email(subject, body, TO_EMAILS):
-            print(f"✅ Successfully sent expiry notification to {len(TO_EMAILS)} recipients.")
-        else:
-            print("❌ Failed to send notification email")
+                subject = f"🚨 {len(expiring_products)} Grocery Item(s) Expiring Soon!"
+
+                if send_email(subject, body, [user_email]):
+                    print(f"✅ Successfully sent expiry notification to {user_email}.")
+                else:
+                    print(f"❌ Failed to send notification to {user_email}")
+            else:
+                print(f"✅ No expiring products for {user_email}")
 
     except Exception as e:
         print(f"❌ Error in main function: {e}")
@@ -112,3 +131,4 @@ if __name__ == "__main__":
     print("🚀 Starting grocery expiry check...")
     main()
     print("🏁 Grocery expiry check completed!")
+
