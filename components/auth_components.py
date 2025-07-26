@@ -1,5 +1,5 @@
 import streamlit as st
-from utils.auth_utils import login_user, register_user, assess_password_strength
+from utils.auth_utils import login_user, register_user, assess_password_strength, add_user_to_db
 
 def render_auth_section():
     # Vertical spacing
@@ -53,6 +53,7 @@ def render_login_form():
                 if email and password:
                     if login_user(email, password):
                         st.session_state["user_email"] = email
+                        add_user_to_db(email)  # Add user to DB for notifications
                         st.success("✅ Welcome back!")
                         st.rerun()
                     else:
@@ -77,6 +78,7 @@ def render_signup_form():
                 if email and password:
                     if "Strong" in assess_password_strength(password):
                         if register_user(email, password):
+                            add_user_to_db(email)  # Add user to DB for notifications
                             st.success("🎉 Account created!")
                             st.session_state["auth_mode"] = "login"
                             st.rerun()

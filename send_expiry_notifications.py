@@ -132,3 +132,10 @@ if __name__ == "__main__":
     main()
     print("🏁 Grocery expiry check completed!")
 
+def test_email():
+    subject = "Test Email from Grocery App"
+    body = "This is a test email to verify sending works."
+    send_email(subject, body, TO_EMAILS)
+
+if __name__ == "__main__":
+    test_email()  # Run this instead of main() for testing

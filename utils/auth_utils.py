@@ -1,20 +1,38 @@
-import re
-from db import find_user, create_user  # Import functions instead of collections
+import hashlib
+from utils.database import users  # Now imports the 'users' collection properly
+
+def hash_password(password):
+    """Hash password for secure storage"""
+    return hashlib.sha256(password.encode()).hexdigest()
 
 def assess_password_strength(password):
-    if len(password) < 6:
-        return "Weak: too short"
-    if not re.search(r"[A-Z]", password):
-        return "Fair: add uppercase"
-    if not re.search(r"[0-9]", password):
-        return "Fair: add number"
-    if not re.search(r"[^A-Za-z0-9]", password):
-        return "Fair: add special character"
-    return "Strong ✅"
-
-def login_user(email, password):
-    user = find_user(email)
-    return user and user.get("password") == password
+    """Assess password strength (basic check)"""
+    if len(password) < 8:
+        return "Weak: Too short"
+    if not any(c.isdigit() for c in password) or not any(c.isupper() for c in password):
+        return "Medium: Add numbers and uppercase letters"
+    return "Strong"
 
 def register_user(email, password):
-    return create_user(email, password)
+    """Register (sign up) a new user"""
+    if users.find_one({"email": email}):
+        return False  # User already exists
+    
+    hashed_pw = hash_password(password)
+    users.insert_one({
+        "email": email,
+        "password": hashed_pw
+    })
+    return True
+
+def login_user(email, password):
+    """Log in user"""
+    user = users.find_one({"email": email})
+    if user and user["password"] == hash_password(password):
+        return True
+    return False
+
+def add_user_to_db(email):
+    """Ensure user exists in users collection."""
+    if users.find_one({"email": email}) is None:
+        users.insert_one({"email": email})
