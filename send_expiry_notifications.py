@@ -4,6 +4,9 @@ from pymongo import MongoClient
 from datetime import datetime, timedelta
 import dateparser
 import os
+import dotenv   
+dotenv.load_dotenv()  # Load environment variables from .env
+from utils.database import users, products  # Import collections from database module
 
 # --- CONFIG ---
 MONGO_URI = os.environ.get("MONGO_URI")
@@ -72,8 +75,8 @@ def main():
 
         print(f"📅 Checking for products expiring on or before: {target_date.strftime('%Y-%m-%d')}")
 
-        lower_bound = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
-        upper_bound = target_date.replace(hour=23, minute=59, second=59, microsecond=999999)
+        now = datetime.now()
+        target_date = now + timedelta(days=3)
 
         for user in users:
             user_email = user.get("email")
@@ -85,10 +88,11 @@ def main():
             products_query = {
                 "user_email": user_email,
                 "expiry": {
-                    "$gte": lower_bound,
-                    "$lte": upper_bound
+                    "$gte": now,
+                    "$lte": target_date
                 }
             }
+        
 
             expiring_products = list(collection.find(products_query))
 

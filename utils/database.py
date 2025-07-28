@@ -26,14 +26,14 @@ def get_deleted_products(user_email):
     return list(deleted_products.find({"user_email": user_email}))
 
 def add_product(user_email, name, expiry):
-    """Add a new product"""
     product = {
         "user_email": user_email,
         "name": name,
         "expiry": expiry,
         "added_at": datetime.now()
     }
-    products.insert_one(product)
+    products.insert_one(product)  # _id is auto-generated!
+
 
 def update_product(product_id, new_name, new_expiry):
     """Update product details"""
