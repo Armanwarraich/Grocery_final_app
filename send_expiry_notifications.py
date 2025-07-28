@@ -84,7 +84,8 @@ def main():
                 continue
 
             print(f"🔍 Checking products for user: {user_email}")
-
+            
+            
             products_query = {
                 "user_email": user_email,
                 "expiry": {
