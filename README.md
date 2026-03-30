@@ -54,7 +54,7 @@ text
 - Sign up/log in to use.
 
 ### 6. Usage
-- **Add Item**: Use the tab to upload images for OCR or add manually.
+- **Add Item**:  Use the tab to upload images for OCR or add manually.
 - **Products**: View and manage your grocery list.
 - **Insights/Alerts**: Check stats and upcoming expiries.
 - **Recycle Bin**: Restore deleted items.
